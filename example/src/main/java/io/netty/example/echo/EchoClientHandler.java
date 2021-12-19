@@ -20,6 +20,10 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Handler implementation for the echo client.  It initiates the ping-pong
  * traffic between the echo client and server by sending the first message to
@@ -28,15 +32,22 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class EchoClientHandler extends ChannelInboundHandlerAdapter {
 
     private final ByteBuf firstMessage;
+    public static   boolean first = true;
 
     /**
      * Creates a client-side handler.
      */
     public EchoClientHandler() {
         firstMessage = Unpooled.buffer(EchoClient.SIZE);
+
         for (int i = 0; i < firstMessage.capacity(); i ++) {
-            firstMessage.writeByte((byte) i);
+            if (first){
+                firstMessage.writeBytes("f".getBytes());
+            }else{
+                firstMessage.writeBytes("s".getBytes());
+            }
         }
+        first=false;
     }
 
     @Override
@@ -45,8 +56,11 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws InterruptedException {
         ctx.write(msg);
+        System.out.println("从服务端收到消息："+ (char)((ByteBuf) msg).getByte(0)  + " " + Thread.currentThread().getName());
+        System.out.println(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        Thread.sleep(1000*1);
     }
 
     @Override

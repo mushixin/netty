@@ -15,9 +15,13 @@
  */
 package io.netty.example.echo;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Handler implementation for the echo server.
@@ -26,8 +30,11 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws InterruptedException {
         ctx.write(msg);
+        System.out.println("客户端收到消息：" + (char)((ByteBuf) msg).getByte(0)  + " " + Thread.currentThread().getName());
+        System.out.println(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        Thread.sleep(1000*30);
     }
 
     @Override
